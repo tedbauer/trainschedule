@@ -50,10 +50,11 @@ fn generate_display_text(train_info: &TrainInfo, stop: &Stop) -> String {
         .eta
         .first()
         .map(|info| info.stop_description.clone());
-    
+
     let stop_name = &stop.name;
 
-    train_info_stop.as_ref()
+    train_info_stop
+        .as_ref()
         .map(|s| {
             let times = train_info
                 .eta
@@ -94,7 +95,6 @@ async fn try_cycle_display(stop: Stop) -> Result<(), String> {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-
     let stop_yaml = "stops.yaml";
     let config: Config = serde_yaml::from_str(
         &fs::read_to_string(stop_yaml).map_err(|err| format!("failed to load yaml: {err}"))?,
@@ -110,7 +110,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let stop = config
             .stops
             .get(current_stop_index)
-            .ok_or(format!("invalid config index: {current_stop_index}"))?.clone();
+            .ok_or(format!("invalid config index: {current_stop_index}"))?
+            .clone();
         spawn(async { try_cycle_display(stop).await });
 
         current_stop_index = (current_stop_index + 1) % config.stops.len();
