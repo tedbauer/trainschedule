@@ -32,6 +32,7 @@ struct Stop {
 #[derive(Debug, Deserialize)]
 struct Config {
     stops: Vec<Stop>,
+    interval: u64,
 }
 
 fn build_request_string(api_key: &str, stop_id: usize) -> String {
@@ -93,13 +94,14 @@ async fn try_cycle_display(stop: Stop) -> Result<(), String> {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut interval = interval(Duration::from_secs(10));
 
     let stop_yaml = "stops.yaml";
     let config: Config = serde_yaml::from_str(
         &fs::read_to_string(stop_yaml).map_err(|err| format!("failed to load yaml: {err}"))?,
     )
     .map_err(|err| format!("failed to parse yaml: {err}"))?;
+
+    let mut interval = interval(Duration::from_secs(config.interval));
 
     let mut current_stop_index = 0;
     loop {

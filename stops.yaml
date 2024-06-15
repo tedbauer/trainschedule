@@ -3,3 +3,4 @@ stops:
     id: 30255
   - name: "Wellington, southbound"
     id: 30232
+interval: 10
